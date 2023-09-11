@@ -18,11 +18,3 @@ public:
 private:
 
 };
-
-Window::Window()
-{
-}
-
-Window::~Window()
-{
-}
