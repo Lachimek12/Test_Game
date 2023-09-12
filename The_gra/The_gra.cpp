@@ -1,12 +1,20 @@
 #include <SDL.h>
+#include <SDL_mixer.h>
 #include <iostream>
 #include "Window.hpp"
 #include "Data_Loader.hpp"
 
-//Screen dimension constants
-const int SCREEN_WIDTH = 640;
-const int SCREEN_HEIGHT = 480;
-
+//Key press surfaces constants
+enum KeyPressSurfaces
+{
+	KEY_PRESS_SURFACE_DEFAULT,
+	KEY_PRESS_SURFACE_UP,
+	KEY_PRESS_SURFACE_DOWN,
+	KEY_PRESS_SURFACE_LEFT,
+	KEY_PRESS_SURFACE_RIGHT,
+	KEY_PRESS_SURFACE_TOTAL,
+	KEY_PRESS_SURFACE_SPACE_BAR
+};
 
 //destroy window and free images
 void close(SDL_Surface** helloWorld);
@@ -28,12 +36,17 @@ int main(int argc, char* args[])
 		SDL_FillRect(window.screenSurface, NULL, SDL_MapRGB(window.screenSurface->format, 0, 0, 200));
 
 		//Load media
-		if (!Data_Loader::LoadImage(&helloWorld, "helloworld.bmp"))
+		helloWorld = Data_Loader::LoadImage(window, "helloworld.bmp");
+		if (helloWorld != NULL)
 		{
-			printf("Failed to load media!\n");
-		}
-		else
-		{
+			//Apply the image stretched
+			SDL_Rect stretchRect;
+			stretchRect.x = 0;
+			stretchRect.y = 0;
+			stretchRect.w = Window::SCREEN_WIDTH;
+			stretchRect.h = Window::SCREEN_HEIGHT;
+			SDL_BlitScaled(helloWorld, NULL, window.screenSurface, &stretchRect);
+
 			//Apply the image
 			SDL_BlitSurface(helloWorld, NULL, window.screenSurface, NULL);
 		}
@@ -42,10 +55,6 @@ int main(int argc, char* args[])
 		SDL_UpdateWindowSurface(window.window);
 
 		stayinAlive();
-	}
-	else
-	{
-		printf("Failed initialize!\n");
 	}
 
 	close(&helloWorld);
@@ -72,6 +81,17 @@ void stayinAlive()
 			if (e.type == SDL_QUIT)
 			{
 				quit = true;
+			}
+			//User presses a key
+			else if (e.type == SDL_KEYDOWN)
+			{
+				//Select surfaces based on key press
+				switch (e.key.keysym.sym)
+				{
+				case SDLK_SPACE:
+					quit = true;
+					break;
+				}
 			}
 		}
 	}
