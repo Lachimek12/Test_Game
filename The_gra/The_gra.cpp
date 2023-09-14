@@ -3,6 +3,10 @@
 #include <iostream>
 #include "Window.hpp"
 #include "Data_Loader.hpp"
+#include "LTexture.hpp"
+
+
+const int WALKING_ANIMATION_FRAMES = 11;
 
 //Key press surfaces constants
 enum KeyPressSurfaces
@@ -17,10 +21,10 @@ enum KeyPressSurfaces
 };
 
 //destroy window and free images
-void close(SDL_Surface** helloWorld);
+void close(LTexture& gFooTexture, LTexture& gBackgroundTexture);
 
 //Hack to get window to stay up
-void stayinAlive();
+void stayinAlive(Window& window, LTexture& gFooTexture, LTexture& gBackgroundTexture, SDL_Rect gSpriteClips[], int sequence[]);
 
 
 int main(int argc, char* args[])
@@ -28,51 +32,54 @@ int main(int argc, char* args[])
 	//Object handling window and main screen surface
 	Window window;
 
-	//The image we will load and show on the screen
-	SDL_Surface* helloWorld = NULL;
+	//Scene textures
+	LTexture gFooTexture;
+	LTexture gBackgroundTexture;
+
+	//Walking animation
+	SDL_Rect gSpriteClips[WALKING_ANIMATION_FRAMES];
+
+	int sequence[22] = { 3,4,5,6,7,8,7,6,9,10,9,6,5,4,5,6,5,4,5,6,5,4 };
 
 	if (window.success)
 	{
-		SDL_FillRect(window.screenSurface, NULL, SDL_MapRGB(window.screenSurface->format, 0, 0, 200));
-
-		//Load media
-		helloWorld = Data_Loader::LoadImage(window, "helloworld.bmp");
-		if (helloWorld != NULL)
+		//Load media //DANCE.BMP POWIÊKSZYÆ TUTAJ W KLASIE LTEXTURE X2
+		if (gFooTexture.LoadFromFile(window, "dance.bmp") && gBackgroundTexture.LoadFromFile(window, "background.bmp"))
 		{
-			//Apply the image stretched
-			SDL_Rect stretchRect;
-			stretchRect.x = 0;
-			stretchRect.y = 0;
-			stretchRect.w = Window::SCREEN_WIDTH;
-			stretchRect.h = Window::SCREEN_HEIGHT;
-			SDL_BlitScaled(helloWorld, NULL, window.screenSurface, &stretchRect);
+			//Set sprite clips
+			for (int i = 0; i < WALKING_ANIMATION_FRAMES; i++)
+			{
+				gSpriteClips[i].x = i * 100;
+				gSpriteClips[i].y = 0;
+				gSpriteClips[i].w = 100;
+				gSpriteClips[i].h = 80;
+			}
 
-			//Apply the image
-			SDL_BlitSurface(helloWorld, NULL, window.screenSurface, NULL);
+			stayinAlive(window, gFooTexture, gBackgroundTexture, gSpriteClips, sequence);
 		}
-
-		//Update the surface
-		SDL_UpdateWindowSurface(window.window);
-
-		stayinAlive();
 	}
 
-	close(&helloWorld);
+	close(gFooTexture, gBackgroundTexture);
 
 	return 0;
 }
 
-void close(SDL_Surface** helloWorld)
+void close(LTexture& gFooTexture, LTexture& gBackgroundTexture)
 {
-	//Deallocate surface
-	SDL_FreeSurface(*helloWorld);
-	*helloWorld = NULL;
+	//Free loaded images
+	gFooTexture.Free();
+	gBackgroundTexture.Free();
 }
 
-void stayinAlive()
+void stayinAlive(Window& window, LTexture& gFooTexture, LTexture& gBackgroundTexture, SDL_Rect gSpriteClips[], int sequence[])
 {
 	SDL_Event e;
+
+	//Main loop flag
 	bool quit = false;
+
+	//Current animation frame
+	int frame = 0;
 
 	while (quit == false)
 	{
@@ -93,6 +100,29 @@ void stayinAlive()
 					break;
 				}
 			}
+		}
+
+		//Clear screen
+		SDL_SetRenderDrawColor(window.renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+		SDL_RenderClear(window.renderer);
+
+		//Render background texture to screen
+		//gBackgroundTexture.Render(window, 0, 0);
+
+		//Render current frame
+		SDL_Rect* currentClip = &gSpriteClips[sequence[frame / 12]];
+		gFooTexture.Render(window, 0, 0);
+
+		//Update screen
+		SDL_RenderPresent(window.renderer);
+
+		//Go to next frame
+		frame++;
+
+		//Cycle animation
+		if (frame / 12 >= 22)
+		{
+			frame = 0;
 		}
 	}
 }

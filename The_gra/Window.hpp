@@ -11,6 +11,9 @@ public:
 	//The surface contained by the window
 	SDL_Surface* screenSurface;
 
+	//The window renderer
+	SDL_Renderer* renderer;
+
 	//Initialization flag
 	bool success;
 
