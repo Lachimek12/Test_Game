@@ -8,9 +8,6 @@ public:
 	//The window we'll be rendering to
 	SDL_Window* window;
 
-	//The surface contained by the window
-	SDL_Surface* screenSurface;
-
 	//The window renderer
 	SDL_Renderer* renderer;
 

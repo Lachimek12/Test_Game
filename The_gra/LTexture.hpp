@@ -18,7 +18,7 @@ public:
     ~LTexture();
 
     //Loads image at specified path
-    bool LoadFromFile(Window& window, std::string path);
+    bool LoadFromFile(Window& window, std::string path, bool isAnimated = false);
 
     //Deallocates texture
     void Free();

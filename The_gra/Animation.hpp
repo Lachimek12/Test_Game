@@ -10,8 +10,8 @@ public:
 	//Deallocate memory
 	void Free();
 
-	//Create new animation
-	void CreateAnimation(int animationFrames, int width, int height, int sequence[]);
+	//Create new animation, width and height are dimensions of 1 animation frame in pixels
+	void CreateAnimation(int animationFrames, int width, int height, int sequence[], int sequenceLength);
 
 	//Set number of frames for a single animation state
 	void SetAnimationSpeed(int framesPerState);

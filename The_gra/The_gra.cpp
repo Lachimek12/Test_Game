@@ -6,8 +6,6 @@
 #include "LTexture.hpp"
 
 
-const int WALKING_ANIMATION_FRAMES = 11;
-
 //Key press surfaces constants
 enum KeyPressSurfaces
 {
@@ -21,10 +19,10 @@ enum KeyPressSurfaces
 };
 
 //destroy window and free images
-void close(LTexture& gFooTexture, LTexture& gBackgroundTexture);
+void close(LTexture& gFooTexture);
 
 //Hack to get window to stay up
-void stayinAlive(Window& window, LTexture& gFooTexture, LTexture& gBackgroundTexture, SDL_Rect gSpriteClips[], int sequence[]);
+void stayinAlive(Window& window, LTexture& gFooTexture);
 
 
 int main(int argc, char* args[])
@@ -34,52 +32,40 @@ int main(int argc, char* args[])
 
 	//Scene textures
 	LTexture gFooTexture;
-	LTexture gBackgroundTexture;
-
-	//Walking animation
-	SDL_Rect gSpriteClips[WALKING_ANIMATION_FRAMES];
-
-	int sequence[22] = { 3,4,5,6,7,8,7,6,9,10,9,6,5,4,5,6,5,4,5,6,5,4 };
 
 	if (window.success)
 	{
-		//Load media //DANCE.BMP POWIÊKSZYÆ TUTAJ W KLASIE LTEXTURE X2
-		if (gFooTexture.LoadFromFile(window, "dance.bmp") && gBackgroundTexture.LoadFromFile(window, "background.bmp"))
+		//Load media
+		if (gFooTexture.LoadFromFile(window, "dance.bmp", true))
 		{
-			//Set sprite clips
-			for (int i = 0; i < WALKING_ANIMATION_FRAMES; i++)
-			{
-				gSpriteClips[i].x = i * 100;
-				gSpriteClips[i].y = 0;
-				gSpriteClips[i].w = 100;
-				gSpriteClips[i].h = 80;
-			}
+			int* sequence = { new int[22] { 3,4,5,6,7,8,7,6,9,10,9,6,5,4,5,6,5,4,5,6,5,4 } };
+			gFooTexture.animation->CreateAnimation(11, 100, 80, sequence, 22);
+			gFooTexture.SetResizeHeight(2);
+			gFooTexture.SetResizeWidth(2);
+			gFooTexture.animation->SetAnimationSpeed(12);
+			sequence = NULL;
 
-			stayinAlive(window, gFooTexture, gBackgroundTexture, gSpriteClips, sequence);
+			stayinAlive(window, gFooTexture);
 		}
 	}
 
-	close(gFooTexture, gBackgroundTexture);
+	//close(gFooTexture);
 
 	return 0;
 }
 
-void close(LTexture& gFooTexture, LTexture& gBackgroundTexture)
+void close(LTexture& gFooTexture)
 {
 	//Free loaded images
 	gFooTexture.Free();
-	gBackgroundTexture.Free();
 }
 
-void stayinAlive(Window& window, LTexture& gFooTexture, LTexture& gBackgroundTexture, SDL_Rect gSpriteClips[], int sequence[])
+void stayinAlive(Window& window, LTexture& gFooTexture)
 {
 	SDL_Event e;
 
 	//Main loop flag
 	bool quit = false;
-
-	//Current animation frame
-	int frame = 0;
 
 	while (quit == false)
 	{
@@ -110,19 +96,11 @@ void stayinAlive(Window& window, LTexture& gFooTexture, LTexture& gBackgroundTex
 		//gBackgroundTexture.Render(window, 0, 0);
 
 		//Render current frame
-		SDL_Rect* currentClip = &gSpriteClips[sequence[frame / 12]];
 		gFooTexture.Render(window, 0, 0);
 
 		//Update screen
 		SDL_RenderPresent(window.renderer);
 
-		//Go to next frame
-		frame++;
-
-		//Cycle animation
-		if (frame / 12 >= 22)
-		{
-			frame = 0;
-		}
+		gFooTexture.animation->Update();
 	}
 }

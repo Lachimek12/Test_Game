@@ -17,7 +17,7 @@ LTexture::~LTexture()
     Free();
 }
 
-bool LTexture::LoadFromFile(Window& window, std::string name)
+bool LTexture::LoadFromFile(Window& window, std::string name, bool isAnimated)
 {
     //Get rid of preexisting texture
     Free();
@@ -61,6 +61,11 @@ bool LTexture::LoadFromFile(Window& window, std::string name)
         SDL_FreeSurface(loadedSurface);
     }
 
+    if (isAnimated)
+    {
+        animation = new Animation;
+    }
+
     //Return success
     mTexture = newTexture;
     return mTexture != NULL;
@@ -81,7 +86,8 @@ void LTexture::Free()
 
     if (animation != NULL)
     {
-        animation->Free();
+        delete animation;
+        animation = NULL;
     }
 }
 

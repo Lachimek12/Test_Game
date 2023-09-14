@@ -2,7 +2,6 @@
 
 Animation::Animation()
 {
-	printf("anime");
 	animationFrames = 0;
 	framesPerState = 0;
 	frame = 0;
@@ -36,7 +35,7 @@ void Animation::Free()
 	sequenceLength = 0;
 }
 
-void Animation::CreateAnimation(int animationFrames, int width, int height, int sequence[])
+void Animation::CreateAnimation(int animationFrames, int width, int height, int sequence[], int sequenceLength)
 {
 	Free();
 
@@ -53,6 +52,8 @@ void Animation::CreateAnimation(int animationFrames, int width, int height, int 
 	}
 
 	this->sequence = sequence;
+	this->sequenceLength = sequenceLength;
+	framesPerState = 4;
 }
 
 void Animation::SetAnimationSpeed(int framesPerState)

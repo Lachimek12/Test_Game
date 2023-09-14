@@ -5,7 +5,7 @@
 const int Window::SCREEN_WIDTH = 200; //640
 const int Window::SCREEN_HEIGHT = 160; //480
 
-Window::Window() : window(NULL), screenSurface(NULL), renderer(NULL), success(true)
+Window::Window() : window(NULL), renderer(NULL), success(true)
 {
 	//Initialize SDL
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
