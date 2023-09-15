@@ -4,6 +4,8 @@
 #include "Window.hpp"
 #include "Data_Loader.hpp"
 #include "LTexture.hpp"
+#include <SDL_mixer.h>
+#include <string>
 
 
 //Key press surfaces constants
@@ -19,7 +21,7 @@ enum KeyPressSurfaces
 };
 
 //destroy window and free images
-void close(LTexture& gFooTexture);
+void close(Mix_Music* gMusic);
 
 //Hack to get window to stay up
 void stayinAlive(Window& window, LTexture& gFooTexture);
@@ -33,10 +35,20 @@ int main(int argc, char* args[])
 	//Scene textures
 	LTexture gFooTexture;
 
+	//The music that will be played
+	Mix_Music* gMusic = NULL;
+
 	if (window.success)
 	{
+		//Load music
+		gMusic = Mix_LoadMUS("music/muzyczkamp3.mp3");
+		if (gMusic == NULL)
+		{
+			printf("Failed to load beat music! SDL_mixer Error: %s\n", Mix_GetError());
+		}
+
 		//Load media
-		if (gFooTexture.LoadFromFile(window, "dance.bmp", true))
+		if (gFooTexture.LoadFromFile(window, "dance.bmp", true) && gMusic != NULL)
 		{
 			int* sequence = { new int[22] { 3,4,5,6,7,8,7,6,9,10,9,6,5,4,5,6,5,4,5,6,5,4 } };
 			gFooTexture.animation->CreateAnimation(11, 100, 80, sequence, 22);
@@ -45,19 +57,30 @@ int main(int argc, char* args[])
 			gFooTexture.animation->SetAnimationSpeed(12);
 			sequence = NULL;
 
+			//If there is no music playing
+			if (Mix_PlayingMusic() == 0)
+			{
+				//Play the music
+				Mix_PlayMusic(gMusic, INFINITY);
+			}
+
 			stayinAlive(window, gFooTexture);
 		}
 	}
 
-	//close(gFooTexture);
+	close(gMusic);
 
 	return 0;
 }
 
-void close(LTexture& gFooTexture)
+void close(Mix_Music* gMusic)
 {
 	//Free loaded images
-	gFooTexture.Free();
+	//gFooTexture.Free();
+
+	//Free the music
+	Mix_FreeMusic(gMusic);
+	gMusic = NULL;
 }
 
 void stayinAlive(Window& window, LTexture& gFooTexture)
