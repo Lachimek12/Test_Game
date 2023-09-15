@@ -54,7 +54,7 @@ int main(int argc, char* args[])
 			gFooTexture.animation->CreateAnimation(11, 100, 80, sequence, 22);
 			gFooTexture.SetResizeHeight(2);
 			gFooTexture.SetResizeWidth(2);
-			gFooTexture.animation->SetAnimationSpeed(12);
+			gFooTexture.animation->SetAnimationSpeed(6); //12 for 120hz, so 6 for 60hz i guess
 			sequence = NULL;
 
 			//If there is no music playing
